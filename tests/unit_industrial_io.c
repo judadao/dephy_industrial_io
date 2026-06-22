@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <dephy_industrial_io/industrial_io.h>
+#include <dephy_industrial_io/modbus_adapter.h>
 #include <dephy_industrial_io/mqtt_bridge.h>
 #include <dephy_industrial_io/payload.h>
 #include <dephy_industrial_io/posix_sim.h>
@@ -12,6 +13,7 @@ static dephy_io_event_t g_last_event;
 static int g_pub_count;
 static char g_last_topic[160];
 static char g_last_payload[160];
+static uint16_t g_modbus_regs[16];
 
 static void on_event(const dephy_io_event_t *event, void *user)
 {
@@ -26,6 +28,28 @@ static int capture_publish(const char *topic, const char *payload, void *user)
     g_pub_count++;
     snprintf(g_last_topic, sizeof(g_last_topic), "%s", topic);
     snprintf(g_last_payload, sizeof(g_last_payload), "%s", payload);
+    return 0;
+}
+
+static int modbus_read(uint8_t unit_id, uint16_t address, uint16_t *value, void *user)
+{
+    (void)unit_id;
+    (void)user;
+    if (!value || address >= 16) {
+        return -1;
+    }
+    *value = g_modbus_regs[address];
+    return 0;
+}
+
+static int modbus_write(uint8_t unit_id, uint16_t address, uint16_t value, void *user)
+{
+    (void)unit_id;
+    (void)user;
+    if (address >= 16) {
+        return -1;
+    }
+    g_modbus_regs[address] = value;
     return 0;
 }
 
@@ -197,6 +221,50 @@ static void test_payload_and_mqtt_bridge(void)
     assert(strcmp(payload, "{\"type\":\"do\",\"value\":1,\"fault\":0,\"t_ms\":0}") == 0);
 }
 
+static void test_modbus_adapter(void)
+{
+    dephy_io_modbus_transport_t transport = {
+        .read_register = modbus_read,
+        .write_register = modbus_write,
+    };
+    dephy_io_modbus_point_t point = {
+        .unit_id = 1,
+        .address = 3,
+        .raw_offset = 10,
+    };
+    dephy_io_channel_config_t channels[] = {
+        {
+            .name = "holding",
+            .type = DEPHY_IO_AI,
+            .driver_channel = 0,
+            .scale_num = 2,
+            .scale_den = 1,
+        },
+        {
+            .name = "command",
+            .type = DEPHY_IO_AO,
+            .driver_channel = 0,
+            .scale_num = 2,
+            .scale_den = 1,
+        },
+    };
+    dephy_io_sample_t sample;
+
+    memset(g_modbus_regs, 0, sizeof(g_modbus_regs));
+    g_modbus_regs[3] = 5;
+    dephy_io_modbus_reset();
+    assert(dephy_io_modbus_set_transport(&transport) == 0);
+    assert(dephy_io_modbus_configure(0, &point) == 0);
+    assert(dephy_io_set_driver(dephy_io_modbus_driver()) == 0);
+    assert(dephy_io_init(channels, 1) == 0);
+    assert(dephy_io_read("holding", &sample) == 0);
+    assert(sample.value == 30);
+
+    assert(dephy_io_init(&channels[1], 1) == 0);
+    assert(dephy_io_write("command", 40) == 0);
+    assert(g_modbus_regs[3] == 10);
+}
+
 int main(void)
 {
     test_di_edges_and_debounce();
@@ -204,6 +272,7 @@ int main(void)
     test_analog_output_write_scaling();
     test_sim_fault_and_stuck();
     test_payload_and_mqtt_bridge();
+    test_modbus_adapter();
     printf("industrial_io unit tests passed\n");
     return 0;
 }

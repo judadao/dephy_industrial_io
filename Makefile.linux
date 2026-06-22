@@ -7,6 +7,7 @@ LIB := $(OUTDIR)/libdephy_industrial_io.a
 OBJS := $(OUTDIR)/src/industrial_io.o \
         $(OUTDIR)/src/payload.o \
         $(OUTDIR)/src/mqtt_bridge.o \
+        $(OUTDIR)/src/modbus_adapter.o \
         $(OUTDIR)/platform/posix/io_posix_sim.o
 
 .PHONY: all test demo todo-check clean
@@ -28,6 +29,11 @@ $(OUTDIR)/src/mqtt_bridge.o: src/mqtt_bridge.c include/dephy_industrial_io/mqtt_
                              include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
 	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
 
+$(OUTDIR)/src/modbus_adapter.o: src/modbus_adapter.c \
+                                include/dephy_industrial_io/modbus_adapter.h \
+                                include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
+
 $(OUTDIR)/platform/posix/io_posix_sim.o: platform/posix/io_posix_sim.c \
                                           include/dephy_industrial_io/industrial_io.h \
                                           include/dephy_industrial_io/posix_sim.h | $(OUTDIR)
@@ -37,14 +43,15 @@ $(LIB): $(OBJS)
 	$(AR) rcs $@ $^
 
 $(OUTDIR)/unit_industrial_io: tests/unit_industrial_io.c src/industrial_io.c \
-                              src/payload.c src/mqtt_bridge.c \
+                              src/payload.c src/mqtt_bridge.c src/modbus_adapter.c \
                               platform/posix/io_posix_sim.c \
                               include/dephy_industrial_io/industrial_io.h \
                               include/dephy_industrial_io/posix_sim.h \
                               include/dephy_industrial_io/payload.h \
-                              include/dephy_industrial_io/mqtt_bridge.h | $(OUTDIR)
+                              include/dephy_industrial_io/mqtt_bridge.h \
+                              include/dephy_industrial_io/modbus_adapter.h | $(OUTDIR)
 	$(CC) $(CFLAGS) -Iinclude tests/unit_industrial_io.c src/industrial_io.c \
-	    src/payload.c src/mqtt_bridge.c \
+	    src/payload.c src/mqtt_bridge.c src/modbus_adapter.c \
 	    platform/posix/io_posix_sim.c -o $@
 
 $(OUTDIR)/linux_io_sim: examples/linux_io_sim.c src/industrial_io.c \

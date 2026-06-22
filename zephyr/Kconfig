@@ -15,6 +15,14 @@ config DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
 	  hook point; board-specific GPIO mapping should be added in the product
 	  or board layer.
 
+config DEPHY_INDUSTRIAL_IO_ZEPHYR_ADC
+	bool "Enable Zephyr ADC driver adapter"
+	default n
+	depends on ADC
+	help
+	  Build the Zephyr ADC adapter for analog input channels. Product or board
+	  code maps driver channels to adc_dt_spec entries before dephy_io_init().
+
 config DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM
 	bool "Enable Zephyr software IO simulator"
 	default n

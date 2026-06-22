@@ -4,9 +4,13 @@ if(CONFIG_DEPHY_INDUSTRIAL_IO)
     ../src/industrial_io.c
     ../src/payload.c
     ../src/mqtt_bridge.c
+    ../src/modbus_adapter.c
   )
   zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
     ../platform/zephyr/io_zephyr_gpio.c
+  )
+  zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_ADC
+    ../platform/zephyr/io_zephyr_adc.c
   )
   zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM
     ../platform/zephyr/io_zephyr_sim.c

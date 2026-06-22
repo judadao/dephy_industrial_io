@@ -30,12 +30,12 @@ items:
 - id: zephyr-gpio
   area: hardware
   title: Add board-specific Zephyr GPIO mapping using devicetree specs.
-  status: todo
+  status: done
 - id: zephyr-adc
   area: hardware
   title: Add ADC adapter and calibration helpers for 0-10V and 4-20mA inputs.
-  status: todo
+  status: done
 - id: modbus-adapter
   area: hardware
   title: Add Modbus RTU/TCP adapter as a separate integration layer.
-  status: todo
+  status: done

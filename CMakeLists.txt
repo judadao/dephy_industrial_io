@@ -6,6 +6,7 @@ target_sources(app PRIVATE
   src/industrial_io.c
   src/payload.c
   src/mqtt_bridge.c
+  src/modbus_adapter.c
 )
 
 target_include_directories(app PRIVATE include)
