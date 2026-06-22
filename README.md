@@ -8,7 +8,14 @@ product configures channels and consumes normalized events; the platform driver
 is the only part that knows whether the signal came from a simulator, GPIO,
 ADC, Modbus, or another field interface.
 
-## Why This Exists
+## Overview
+
+Use this repo when product code needs to read industrial IO signals, simulate
+them on Linux, or publish normalized IO state through MQTT. The important
+concept is simple: product logic talks to one IO API, while the driver behind it
+can be swapped from simulator to real hardware.
+
+## Key Value
 
 - Product logic can be tested before hardware is ready.
 - Simulated IO states use the same raw-driver model as real adapters.
@@ -17,7 +24,7 @@ ADC, Modbus, or another field interface.
 - ESP32 firmware can start with the software simulator, then swap in real IO
   adapters without changing product workflow code.
 
-## Normal Flow
+## How To Use
 
 1. Define channel configs: digital inputs, analog inputs, names, scale, and
    debounce policy.
