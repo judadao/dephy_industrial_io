@@ -14,6 +14,7 @@ static int g_pub_count;
 static char g_last_topic[160];
 static char g_last_payload[160];
 static uint16_t g_modbus_regs[16];
+static int g_modbus_force_error;
 
 static void on_event(const dephy_io_event_t *event, void *user)
 {
@@ -35,6 +36,9 @@ static int modbus_read(uint8_t unit_id, uint16_t address, uint16_t *value, void 
 {
     (void)unit_id;
     (void)user;
+    if (g_modbus_force_error) {
+        return -1;
+    }
     if (!value || address >= 16) {
         return -1;
     }
@@ -46,6 +50,9 @@ static int modbus_write(uint8_t unit_id, uint16_t address, uint16_t value, void 
 {
     (void)unit_id;
     (void)user;
+    if (g_modbus_force_error) {
+        return -1;
+    }
     if (address >= 16) {
         return -1;
     }
@@ -251,18 +258,57 @@ static void test_modbus_adapter(void)
     dephy_io_sample_t sample;
 
     memset(g_modbus_regs, 0, sizeof(g_modbus_regs));
+    g_modbus_force_error = 0;
     g_modbus_regs[3] = 5;
     dephy_io_modbus_reset();
     assert(dephy_io_modbus_set_transport(&transport) == 0);
     assert(dephy_io_modbus_configure(0, &point) == 0);
     assert(dephy_io_set_driver(dephy_io_modbus_driver()) == 0);
     assert(dephy_io_init(channels, 1) == 0);
+    dephy_io_set_event_callback(on_event, 0);
     assert(dephy_io_read("holding", &sample) == 0);
     assert(sample.value == 30);
 
     assert(dephy_io_init(&channels[1], 1) == 0);
     assert(dephy_io_write("command", 40) == 0);
     assert(g_modbus_regs[3] == 10);
+
+    g_modbus_force_error = 1;
+    g_events = 0;
+    assert(dephy_io_write("command", 44) != 0);
+    assert(g_events == 1);
+    assert(g_last_event.type == DEPHY_IO_EVENT_FAULT);
+    assert(dephy_io_read("command", &sample) == 0);
+    assert(sample.fault == 1);
+    g_modbus_force_error = 0;
+}
+
+static void test_driver_fault_injection(void)
+{
+    dephy_io_channel_config_t channels[] = {
+        {
+            .name = "pressure",
+            .type = DEPHY_IO_AI,
+            .driver_channel = 7,
+            .scale_num = 1,
+            .scale_den = 1,
+        },
+    };
+    dephy_io_sample_t sample;
+
+    dephy_io_posix_sim_reset();
+    assert(dephy_io_set_driver(dephy_io_posix_sim_driver()) == 0);
+    assert(dephy_io_init(channels, 1) == 0);
+    dephy_io_set_event_callback(on_event, 0);
+    g_events = 0;
+
+    assert(dephy_io_posix_sim_set_fault(7, 1) == 0);
+    assert(dephy_io_poll() == 0);
+    assert(g_events == 1);
+    assert(g_last_event.type == DEPHY_IO_EVENT_FAULT);
+    assert(dephy_io_read("pressure", &sample) == 0);
+    assert(sample.fault == 1);
+    assert(dephy_io_write("pressure", 1) != 0);
 }
 
 int main(void)
@@ -273,6 +319,7 @@ int main(void)
     test_sim_fault_and_stuck();
     test_payload_and_mqtt_bridge();
     test_modbus_adapter();
+    test_driver_fault_injection();
     printf("industrial_io unit tests passed\n");
     return 0;
 }

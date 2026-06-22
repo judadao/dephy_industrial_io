@@ -27,8 +27,8 @@ Source of truth: `docs/todo.yaml`. Update YAML before starting or completing wor
 
 ## performance
 
-- [ ] Add a repeatable simulator benchmark for channel count, noise injection, and MQTT payload formatting.
+- [x] Add a repeatable simulator benchmark for channel count, noise injection, and MQTT payload formatting.
 
 ## validation
 
-- [ ] Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the common IO boundary.
+- [x] Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the common IO boundary.

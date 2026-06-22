@@ -59,9 +59,11 @@ items:
   area: performance
   title: Add a repeatable simulator benchmark for channel count, noise injection,
     and MQTT payload formatting.
-  status: todo
+  status: done
+  notes: Added scripts/bench_simulator_state.sh and wired it into Makefile.linux test.
 - id: hardware-driver-fault-injection
   area: validation
   title: Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the
     common IO boundary.
-  status: todo
+  status: done
+  notes: Added simulator and Modbus driver fault-injection unit coverage.

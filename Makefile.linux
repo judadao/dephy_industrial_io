@@ -10,7 +10,7 @@ OBJS := $(OUTDIR)/src/industrial_io.o \
         $(OUTDIR)/src/modbus_adapter.o \
         $(OUTDIR)/platform/posix/io_posix_sim.o
 
-.PHONY: all test demo todo-check clean
+.PHONY: all test demo todo-check bench clean
 
 all: $(LIB)
 
@@ -70,6 +70,10 @@ todo-check:
 test: todo-check $(OUTDIR)/unit_industrial_io $(OUTDIR)/linux_io_sim
 	$(OUTDIR)/unit_industrial_io
 	sh scripts/test_linux_io_sim.sh
+	sh scripts/bench_simulator_state.sh
+
+bench: $(OUTDIR)/unit_industrial_io
+	sh scripts/bench_simulator_state.sh
 
 clean:
 	rm -rf $(OUTDIR)
