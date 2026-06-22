@@ -79,11 +79,47 @@ static void test_output_write(void)
     assert(raw == 1);
 }
 
+static void test_sim_fault_and_stuck(void)
+{
+    dephy_io_channel_config_t channels[] = {
+        {
+            .name = "pressure",
+            .type = DEPHY_IO_AI,
+            .driver_channel = 3,
+            .scale_num = 10,
+            .scale_den = 1,
+        },
+    };
+    dephy_io_sample_t sample;
+
+    dephy_io_posix_sim_reset();
+    assert(dephy_io_set_driver(dephy_io_posix_sim_driver()) == 0);
+    assert(dephy_io_init(channels, 1) == 0);
+    dephy_io_set_event_callback(on_event, 0);
+    g_events = 0;
+
+    assert(dephy_io_posix_sim_set_fault(3, 1) == 0);
+    assert(dephy_io_poll() == 0);
+    assert(g_events == 1);
+    assert(g_last_event.type == DEPHY_IO_EVENT_FAULT);
+    assert(dephy_io_read("pressure", &sample) == 0);
+    assert(sample.fault == 1);
+
+    assert(dephy_io_posix_sim_set_fault(3, 0) == 0);
+    assert(dephy_io_posix_sim_set_stuck(3, 1, 7) == 0);
+    assert(dephy_io_posix_sim_set_raw(3, 12) == 0);
+    dephy_io_posix_sim_advance_ms(1);
+    assert(dephy_io_poll() == 0);
+    assert(dephy_io_read("pressure", &sample) == 0);
+    assert(sample.value == 70);
+    assert(sample.fault == 0);
+}
+
 int main(void)
 {
     test_di_edges_and_debounce();
     test_output_write();
+    test_sim_fault_and_stuck();
     printf("industrial_io unit tests passed\n");
     return 0;
 }
-

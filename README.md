@@ -28,6 +28,13 @@ The Linux demo uses the POSIX simulator to fake IO changes:
 - `relay`: digital output write path.
 - `pressure_ma_x100`: analog input scaling example.
 
+The simulator driver models bottom-level raw signal behavior:
+
+- normal raw changes
+- read fault/disconnect
+- stuck-at raw value
+- deterministic raw noise/jitter
+
 ## Zephyr Use
 
 Add this repository to `ZEPHYR_EXTRA_MODULES`, then enable:
