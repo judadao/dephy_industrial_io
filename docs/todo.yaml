@@ -42,20 +42,26 @@ items:
 - id: align-golden-sample
   area: repo
   title: Align repository layout with dephy_module_golden_sample.
-  status: in_progress
+  status: done
+  notes: Repository now passes dephy_module_golden_sample/scripts/audit_module_structure.sh.
 - id: add-agents-doc
   area: repo
   title: Add AGENTS.md with module workflow, build, and testing guidance.
-  status: todo
+  status: done
+  notes: Added AGENTS.md with module workflow and validation guidance.
 - id: module-structure-doc
   area: repo
-  title: Add docs/module_structure.md describing public API, source, Zephyr, simulator, and test layout.
-  status: todo
+  title: Add docs/module_structure.md describing public API, source, Zephyr, simulator,
+    and test layout.
+  status: done
+  notes: Added docs/module_structure.md covering public API and adapter layout.
 - id: simulator-state-benchmark
   area: performance
-  title: Add a repeatable simulator benchmark for channel count, noise injection, and MQTT payload formatting.
+  title: Add a repeatable simulator benchmark for channel count, noise injection,
+    and MQTT payload formatting.
   status: todo
 - id: hardware-driver-fault-injection
   area: validation
-  title: Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the common IO boundary.
+  title: Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the
+    common IO boundary.
   status: todo

@@ -21,9 +21,9 @@ Source of truth: `docs/todo.yaml`. Update YAML before starting or completing wor
 
 ## repo
 
-- [ ] Align repository layout with dephy_module_golden_sample. (`in_progress`)
-- [ ] Add AGENTS.md with module workflow, build, and testing guidance.
-- [ ] Add docs/module_structure.md describing public API, source, Zephyr, simulator, and test layout.
+- [x] Align repository layout with dephy_module_golden_sample.
+- [x] Add AGENTS.md with module workflow, build, and testing guidance.
+- [x] Add docs/module_structure.md describing public API, source, Zephyr, simulator, and test layout.
 
 ## performance
 
