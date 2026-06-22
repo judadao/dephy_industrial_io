@@ -5,9 +5,11 @@ OUTDIR  ?= build_out
 
 LIB := $(OUTDIR)/libdephy_industrial_io.a
 OBJS := $(OUTDIR)/src/industrial_io.o \
+        $(OUTDIR)/src/payload.o \
+        $(OUTDIR)/src/mqtt_bridge.o \
         $(OUTDIR)/platform/posix/io_posix_sim.o
 
-.PHONY: all test demo clean
+.PHONY: all test demo todo-check clean
 
 all: $(LIB)
 
@@ -15,6 +17,15 @@ $(OUTDIR):
 	mkdir -p $(OUTDIR)/src $(OUTDIR)/platform/posix
 
 $(OUTDIR)/src/industrial_io.o: src/industrial_io.c include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
+
+$(OUTDIR)/src/payload.o: src/payload.c include/dephy_industrial_io/payload.h \
+                         include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
+
+$(OUTDIR)/src/mqtt_bridge.o: src/mqtt_bridge.c include/dephy_industrial_io/mqtt_bridge.h \
+                             include/dephy_industrial_io/payload.h \
+                             include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
 	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
 
 $(OUTDIR)/platform/posix/io_posix_sim.o: platform/posix/io_posix_sim.c \
@@ -26,10 +37,14 @@ $(LIB): $(OBJS)
 	$(AR) rcs $@ $^
 
 $(OUTDIR)/unit_industrial_io: tests/unit_industrial_io.c src/industrial_io.c \
+                              src/payload.c src/mqtt_bridge.c \
                               platform/posix/io_posix_sim.c \
                               include/dephy_industrial_io/industrial_io.h \
-                              include/dephy_industrial_io/posix_sim.h | $(OUTDIR)
+                              include/dephy_industrial_io/posix_sim.h \
+                              include/dephy_industrial_io/payload.h \
+                              include/dephy_industrial_io/mqtt_bridge.h | $(OUTDIR)
 	$(CC) $(CFLAGS) -Iinclude tests/unit_industrial_io.c src/industrial_io.c \
+	    src/payload.c src/mqtt_bridge.c \
 	    platform/posix/io_posix_sim.c -o $@
 
 $(OUTDIR)/linux_io_sim: examples/linux_io_sim.c src/industrial_io.c \
@@ -42,7 +57,10 @@ $(OUTDIR)/linux_io_sim: examples/linux_io_sim.c src/industrial_io.c \
 demo: $(OUTDIR)/linux_io_sim
 	$(OUTDIR)/linux_io_sim
 
-test: $(OUTDIR)/unit_industrial_io $(OUTDIR)/linux_io_sim
+todo-check:
+	python3 ../dephy_todo/tools/dephy_todo.py validate docs/todo.yaml
+
+test: todo-check $(OUTDIR)/unit_industrial_io $(OUTDIR)/linux_io_sim
 	$(OUTDIR)/unit_industrial_io
 	sh scripts/test_linux_io_sim.sh
 

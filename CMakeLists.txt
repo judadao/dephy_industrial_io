@@ -4,7 +4,8 @@ project(dephy_industrial_io)
 
 target_sources(app PRIVATE
   src/industrial_io.c
+  src/payload.c
+  src/mqtt_bridge.c
 )
 
 target_include_directories(app PRIVATE include)
-

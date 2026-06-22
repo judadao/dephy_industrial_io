@@ -3,16 +3,30 @@
 #include <string.h>
 
 #include <dephy_industrial_io/industrial_io.h>
+#include <dephy_industrial_io/mqtt_bridge.h>
+#include <dephy_industrial_io/payload.h>
 #include <dephy_industrial_io/posix_sim.h>
 
 static int g_events;
 static dephy_io_event_t g_last_event;
+static int g_pub_count;
+static char g_last_topic[160];
+static char g_last_payload[160];
 
 static void on_event(const dephy_io_event_t *event, void *user)
 {
     (void)user;
     g_events++;
     g_last_event = *event;
+}
+
+static int capture_publish(const char *topic, const char *payload, void *user)
+{
+    (void)user;
+    g_pub_count++;
+    snprintf(g_last_topic, sizeof(g_last_topic), "%s", topic);
+    snprintf(g_last_payload, sizeof(g_last_payload), "%s", payload);
+    return 0;
 }
 
 static void test_di_edges_and_debounce(void)
@@ -141,12 +155,55 @@ static void test_sim_fault_and_stuck(void)
     assert(sample.fault == 0);
 }
 
+static void test_payload_and_mqtt_bridge(void)
+{
+    dephy_io_channel_config_t channels[] = {
+        {
+            .name = "relay",
+            .type = DEPHY_IO_DO,
+            .driver_channel = 5,
+            .scale_num = 1,
+            .scale_den = 1,
+        },
+    };
+    dephy_io_mqtt_bridge_config_t cfg = {
+        .site = "factory-a",
+        .node = "node-1",
+        .publish = capture_publish,
+        .publish_state_on_event = 1,
+    };
+    char topic[128];
+    char payload[128];
+
+    dephy_io_posix_sim_reset();
+    assert(dephy_io_set_driver(dephy_io_posix_sim_driver()) == 0);
+    assert(dephy_io_init(channels, 1) == 0);
+    assert(dephy_io_format_topic(topic, sizeof(topic),
+                                 "factory-a", "node-1", "relay", "state") > 0);
+    assert(strcmp(topic, "site/factory-a/node/node-1/io/relay/state") == 0);
+
+    g_pub_count = 0;
+    assert(dephy_io_mqtt_bridge_init(&cfg) == 0);
+    dephy_io_set_event_callback(dephy_io_mqtt_bridge_handle_event, 0);
+    assert(dephy_io_mqtt_bridge_handle_command(
+               "site/factory-a/node/node-1/io/relay/set", "1") == 0);
+    assert(g_pub_count == 2);
+    assert(strcmp(g_last_topic, "site/factory-a/node/node-1/io/relay/state") == 0);
+    assert(strstr(g_last_payload, "\"value\":1") != 0);
+
+    dephy_io_sample_t sample;
+    assert(dephy_io_read("relay", &sample) == 0);
+    assert(dephy_io_format_sample_json(payload, sizeof(payload), &sample) > 0);
+    assert(strcmp(payload, "{\"type\":\"do\",\"value\":1,\"fault\":0,\"t_ms\":0}") == 0);
+}
+
 int main(void)
 {
     test_di_edges_and_debounce();
     test_output_write();
     test_analog_output_write_scaling();
     test_sim_fault_and_stuck();
+    test_payload_and_mqtt_bridge();
     printf("industrial_io unit tests passed\n");
     return 0;
 }

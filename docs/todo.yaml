@@ -1,0 +1,41 @@
+version: 1
+policy:
+  source_of_truth: docs/todo.yaml
+  rules:
+  - Before starting work, add or update the relevant TODO item.
+  - When behavior changes, update TODO status in the same change.
+  - Keep docs/todo.md as a human-readable summary generated from this file.
+items:
+- id: sim-parity
+  area: simulator
+  title: Keep POSIX and Zephyr simulator drivers behavior-compatible.
+  status: done
+- id: sim-raw-states
+  area: simulator
+  title: 'Model raw signal states used by real drivers: normal, fault, stuck-at, and
+    noise.'
+  status: done
+- id: sim-ao-unit
+  area: simulator
+  title: Add AO coverage to simulator unit tests.
+  status: done
+- id: payload-helper
+  area: integration
+  title: Add formal event payload helper shared by product and testkit.
+  status: done
+- id: mqtt-bridge-helper
+  area: integration
+  title: Add MQTT bridge helper for state, event, command, and fault topics.
+  status: done
+- id: zephyr-gpio
+  area: hardware
+  title: Add board-specific Zephyr GPIO mapping using devicetree specs.
+  status: todo
+- id: zephyr-adc
+  area: hardware
+  title: Add ADC adapter and calibration helpers for 0-10V and 4-20mA inputs.
+  status: todo
+- id: modbus-adapter
+  area: hardware
+  title: Add Modbus RTU/TCP adapter as a separate integration layer.
+  status: todo

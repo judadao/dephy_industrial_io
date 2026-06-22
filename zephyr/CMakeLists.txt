@@ -1,6 +1,10 @@
 if(CONFIG_DEPHY_INDUSTRIAL_IO)
   zephyr_library_named(dephy_industrial_io)
-  zephyr_library_sources(../src/industrial_io.c)
+  zephyr_library_sources(
+    ../src/industrial_io.c
+    ../src/payload.c
+    ../src/mqtt_bridge.c
+  )
   zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
     ../platform/zephyr/io_zephyr_gpio.c
   )
