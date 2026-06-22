@@ -79,6 +79,32 @@ static void test_output_write(void)
     assert(raw == 1);
 }
 
+static void test_analog_output_write_scaling(void)
+{
+    dephy_io_channel_config_t channels[] = {
+        {
+            .name = "valve",
+            .type = DEPHY_IO_AO,
+            .driver_channel = 4,
+            .scale_num = 10,
+            .scale_den = 1,
+        },
+    };
+    int32_t raw = 0;
+    dephy_io_sample_t sample;
+
+    dephy_io_posix_sim_reset();
+    assert(dephy_io_set_driver(dephy_io_posix_sim_driver()) == 0);
+    assert(dephy_io_init(channels, 1) == 0);
+
+    assert(dephy_io_write("valve", 70) == 0);
+    assert(dephy_io_posix_sim_get_raw(4, &raw) == 0);
+    assert(raw == 7);
+    assert(dephy_io_read("valve", &sample) == 0);
+    assert(sample.value == 70);
+    assert(sample.fault == 0);
+}
+
 static void test_sim_fault_and_stuck(void)
 {
     dephy_io_channel_config_t channels[] = {
@@ -119,6 +145,7 @@ int main(void)
 {
     test_di_edges_and_debounce();
     test_output_write();
+    test_analog_output_write_scaling();
     test_sim_fault_and_stuck();
     printf("industrial_io unit tests passed\n");
     return 0;
