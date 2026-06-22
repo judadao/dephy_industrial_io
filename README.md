@@ -19,7 +19,14 @@ writes.
 ```sh
 make -f Makefile.linux
 make -f Makefile.linux test
+make -f Makefile.linux demo
 ```
+
+The Linux demo uses the POSIX simulator to fake IO changes:
+
+- `door`: digital input with debounce and rising/falling events.
+- `relay`: digital output write path.
+- `pressure_ma_x100`: analog input scaling example.
 
 ## Zephyr Use
 
@@ -48,4 +55,3 @@ static const dephy_io_channel_config_t channels[] = {
 dephy_io_set_driver(my_driver);
 dephy_io_init(channels, 1);
 ```
-
