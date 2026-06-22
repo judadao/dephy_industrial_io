@@ -67,3 +67,8 @@ stable product-facing IO state.
 
 - `docs/module_structure.md`: public API, adapter, and test layout.
 - `docs/todo.md`: current TODO summary.
+
+## License
+
+MIT. See `LICENSE` and `NOTICE.md`. Reuse and references are allowed, but the
+copyright notice and attribution to Judd (judadao) must be preserved.

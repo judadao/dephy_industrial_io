@@ -1,7 +1,17 @@
 {
   "repo_type": "module",
   "name": "dephy_industrial_io",
+  "description": "Reusable industrial IO boundary with Linux/Zephyr simulators, GPIO/ADC adapters, Modbus mapping, and MQTT payload helpers.",
   "module_kind": "industrial_io",
-  "product_dependency_allowed": true
+  "product_dependency_allowed": true,
+  "license": "MIT",
+  "attribution_notice": "Copyright notice and attribution to Judd (judadao) must be preserved.",
+  "topics": [
+    "dephy",
+    "industrial-io",
+    "io-simulator",
+    "zephyr",
+    "mqtt",
+    "modbus"
+  ]
 }
-
