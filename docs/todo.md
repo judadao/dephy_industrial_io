@@ -18,3 +18,17 @@ Source of truth: `docs/todo.yaml`. Update YAML before starting or completing wor
 - [x] Add board-specific Zephyr GPIO mapping using devicetree specs.
 - [x] Add ADC adapter and calibration helpers for 0-10V and 4-20mA inputs.
 - [x] Add Modbus RTU/TCP adapter as a separate integration layer.
+
+## repo
+
+- [ ] Align repository layout with dephy_module_golden_sample. (`in_progress`)
+- [ ] Add AGENTS.md with module workflow, build, and testing guidance.
+- [ ] Add docs/module_structure.md describing public API, source, Zephyr, simulator, and test layout.
+
+## performance
+
+- [ ] Add a repeatable simulator benchmark for channel count, noise injection, and MQTT payload formatting.
+
+## validation
+
+- [ ] Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the common IO boundary.

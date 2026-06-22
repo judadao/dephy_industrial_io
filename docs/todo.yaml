@@ -39,3 +39,23 @@ items:
   area: hardware
   title: Add Modbus RTU/TCP adapter as a separate integration layer.
   status: done
+- id: align-golden-sample
+  area: repo
+  title: Align repository layout with dephy_module_golden_sample.
+  status: in_progress
+- id: add-agents-doc
+  area: repo
+  title: Add AGENTS.md with module workflow, build, and testing guidance.
+  status: todo
+- id: module-structure-doc
+  area: repo
+  title: Add docs/module_structure.md describing public API, source, Zephyr, simulator, and test layout.
+  status: todo
+- id: simulator-state-benchmark
+  area: performance
+  title: Add a repeatable simulator benchmark for channel count, noise injection, and MQTT payload formatting.
+  status: todo
+- id: hardware-driver-fault-injection
+  area: validation
+  title: Add tests that fault-inject GPIO, ADC, and Modbus driver errors through the common IO boundary.
+  status: todo
