@@ -1,0 +1,40 @@
+CC      ?= gcc
+AR      ?= ar
+CFLAGS  ?= -Wall -Wextra -std=c11 -g
+OUTDIR  ?= build_out
+
+LIB := $(OUTDIR)/libdephy_industrial_io.a
+OBJS := $(OUTDIR)/src/industrial_io.o \
+        $(OUTDIR)/platform/posix/io_posix_sim.o
+
+.PHONY: all test clean
+
+all: $(LIB)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)/src $(OUTDIR)/platform/posix
+
+$(OUTDIR)/src/industrial_io.o: src/industrial_io.c include/dephy_industrial_io/industrial_io.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
+
+$(OUTDIR)/platform/posix/io_posix_sim.o: platform/posix/io_posix_sim.c \
+                                          include/dephy_industrial_io/industrial_io.h \
+                                          include/dephy_industrial_io/posix_sim.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude -c $< -o $@
+
+$(LIB): $(OBJS)
+	$(AR) rcs $@ $^
+
+$(OUTDIR)/unit_industrial_io: tests/unit_industrial_io.c src/industrial_io.c \
+                              platform/posix/io_posix_sim.c \
+                              include/dephy_industrial_io/industrial_io.h \
+                              include/dephy_industrial_io/posix_sim.h | $(OUTDIR)
+	$(CC) $(CFLAGS) -Iinclude tests/unit_industrial_io.c src/industrial_io.c \
+	    platform/posix/io_posix_sim.c -o $@
+
+test: $(OUTDIR)/unit_industrial_io
+	$(OUTDIR)/unit_industrial_io
+
+clean:
+	rm -rf $(OUTDIR)
+

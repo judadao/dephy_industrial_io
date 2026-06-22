@@ -1,0 +1,5 @@
+name: dephy_industrial_io
+build:
+  cmake: zephyr
+  kconfig: zephyr/Kconfig
+

@@ -1,0 +1,7 @@
+{
+  "repo_type": "module",
+  "name": "dephy_industrial_io",
+  "module_kind": "industrial_io",
+  "product_dependency_allowed": true
+}
+

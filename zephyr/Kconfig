@@ -1,0 +1,24 @@
+menuconfig DEPHY_INDUSTRIAL_IO
+	bool "Dephy industrial IO"
+	default n
+	help
+	  Enable reusable industrial IO channel handling. Product apps provide
+	  channel configuration and choose a platform driver.
+
+if DEPHY_INDUSTRIAL_IO
+
+config DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
+	bool "Enable Zephyr GPIO driver adapter"
+	default n
+	help
+	  Build the Zephyr GPIO adapter. The first revision provides the module
+	  hook point; board-specific GPIO mapping should be added in the product
+	  or board layer.
+
+config DEPHY_IO_MAX_CHANNELS
+	int "Maximum IO channels"
+	default 32
+	range 1 256
+
+endif
+

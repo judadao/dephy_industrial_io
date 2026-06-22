@@ -1,0 +1,8 @@
+mainmenu "Dephy Industrial IO"
+
+source "Kconfig.zephyr"
+
+config DEPHY_INDUSTRIAL_IO
+	bool "Dephy industrial IO module"
+	default y
+
