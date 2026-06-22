@@ -2,10 +2,50 @@
 
 Reusable industrial IO module for Dephy product applications.
 
-The module owns the portable IO boundary: channel config, scaling, debounce,
-event generation, bounded payload formatting, MQTT bridge helpers, simulator
-drivers, and hardware adapter APIs. Product code should configure channels,
-select a driver, and call the public API.
+`dephy_industrial_io` gives products one stable IO boundary that works in three
+places: Linux tests, Zephyr simulator builds, and real hardware adapters. A
+product configures channels and consumes normalized events; the platform driver
+is the only part that knows whether the signal came from a simulator, GPIO,
+ADC, Modbus, or another field interface.
+
+## Why This Exists
+
+- Product logic can be tested before hardware is ready.
+- Simulated IO states use the same raw-driver model as real adapters.
+- Scaling, debounce, fault handling, and payload formatting are reusable.
+- MQTT bridge helpers produce deterministic topics and JSON payloads.
+- ESP32 firmware can start with the software simulator, then swap in real IO
+  adapters without changing product workflow code.
+
+## Normal Flow
+
+1. Define channel configs: digital inputs, analog inputs, names, scale, and
+   debounce policy.
+2. Select a driver: POSIX simulator, Zephyr simulator, GPIO, ADC, or field-bus
+   adapter.
+3. Initialize the module with `dephy_io_init()`.
+4. Poll with `dephy_io_poll()` from the product loop or Zephyr work context.
+5. Consume normalized channel state and publish through the MQTT bridge helpers.
+
+Minimal usage:
+
+```c
+dephy_io_set_driver(my_driver);
+dephy_io_init(channels, channel_count);
+dephy_io_poll();
+```
+
+## How It Works
+
+All platform behavior enters through `dephy_io_driver_t`. Drivers expose raw
+signal state, while the portable core owns debouncing, scaling, event
+generation, fault state, and bounded payload formatting. This keeps hardware
+code small and lets tests exercise the same behavior that a product will use on
+target hardware.
+
+The simulators can model normal signals, faults, stuck-at values, and noise.
+Those states are intentionally close to the bottom of the stack so higher-level
+product tests do not depend on fake product-only shortcuts.
 
 ## Layout
 
@@ -20,8 +60,6 @@ tests/                        C unit tests
 zephyr/                       Zephyr module metadata
 ```
 
-See `docs/module_structure.md` for the full contract.
-
 ## Commands
 
 ```sh
@@ -35,24 +73,9 @@ scripts/test_zephyr_module.sh --metadata-only
 `test` validates unit behavior, Linux simulator behavior, simulator benchmark
 output, and TODO YAML.
 
-## Driver Boundary
+## More Docs
 
-All platform behavior enters through `dephy_io_driver_t`:
-
-```c
-dephy_io_set_driver(my_driver);
-dephy_io_init(channels, channel_count);
-dephy_io_poll();
-```
-
-The POSIX and Zephyr simulators model raw signal states used by real drivers:
-normal, fault, stuck-at, and noise. ESP32 firmware can first run the Zephyr
-software simulator, then swap in GPIO/ADC/Modbus adapters.
-
-## MQTT Bridge
-
-`payload.h` and `mqtt_bridge.h` provide deterministic topic and JSON payload
-helpers for product and testkit integration.
+See `docs/module_structure.md` for the full module contract.
 
 ## TODO
 
