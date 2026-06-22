@@ -1,4 +1,4 @@
-#include <dephy_industrial_io/industrial_io.h>
+#include <dephy_industrial_io/zephyr_gpio.h>
 
 #include <zephyr/kernel.h>
 
@@ -41,4 +41,3 @@ const dephy_io_driver_t *dephy_io_zephyr_gpio_driver(void)
 
     return &driver;
 }
-

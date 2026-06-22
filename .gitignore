@@ -1,5 +1,5 @@
 build_out/
+build/
 *.o
 *.a
 *.log
-

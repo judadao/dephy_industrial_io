@@ -55,3 +55,29 @@ static const dephy_io_channel_config_t channels[] = {
 dephy_io_set_driver(my_driver);
 dephy_io_init(channels, 1);
 ```
+
+## ESP32 IO Simulation
+
+For firmware tests on ESP32 without wiring real IO, enable:
+
+```conf
+CONFIG_DEPHY_INDUSTRIAL_IO=y
+CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM=y
+```
+
+Then use the Zephyr software simulator driver:
+
+```c
+#include <dephy_industrial_io/industrial_io.h>
+#include <dephy_industrial_io/zephyr_sim.h>
+
+dephy_io_set_driver(dephy_io_zephyr_sim_driver());
+dephy_io_init(channels, channel_count);
+
+dephy_io_zephyr_sim_set_raw(0, 1);
+dephy_io_poll();
+```
+
+This validates product logic, debounce, scaling, MQTT bridge behavior, and UI
+workflows. It does not validate electrical behavior. For pin-level testing,
+wire an ESP32 output GPIO to an input GPIO and run the GPIO adapter instead.

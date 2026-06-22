@@ -4,7 +4,9 @@ if(CONFIG_DEPHY_INDUSTRIAL_IO)
   zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
     ../platform/zephyr/io_zephyr_gpio.c
   )
+  zephyr_library_sources_ifdef(CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM
+    ../platform/zephyr/io_zephyr_sim.c
+  )
   zephyr_library_include_directories(../include)
   zephyr_include_directories(../include)
 endif()
-

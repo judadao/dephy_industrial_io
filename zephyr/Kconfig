@@ -15,10 +15,18 @@ config DEPHY_INDUSTRIAL_IO_ZEPHYR_GPIO
 	  hook point; board-specific GPIO mapping should be added in the product
 	  or board layer.
 
+config DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM
+	bool "Enable Zephyr software IO simulator"
+	default n
+	help
+	  Build an in-memory Zephyr IO driver for ESP32 and native_sim firmware
+	  tests. This does not touch real pins; product code or tests can change
+	  raw channel values and exercise IO events, MQTT publishing, and command
+	  handling on device.
+
 config DEPHY_IO_MAX_CHANNELS
 	int "Maximum IO channels"
 	default 32
 	range 1 256
 
 endif
-

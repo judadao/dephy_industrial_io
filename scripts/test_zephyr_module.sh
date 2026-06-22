@@ -31,17 +31,19 @@ mkdir -p "$APP_DIR/src"
 cat > "$APP_DIR/src/main.c" <<'EOF'
 #include <zephyr/kernel.h>
 #include <dephy_industrial_io/industrial_io.h>
+#include <dephy_industrial_io/zephyr_sim.h>
 
 int main(void)
 {
+    dephy_io_set_driver(dephy_io_zephyr_sim_driver());
     return (int)dephy_io_channel_count();
 }
 EOF
 
 cat > "$APP_DIR/prj.conf" <<'EOF'
 CONFIG_DEPHY_INDUSTRIAL_IO=y
+CONFIG_DEPHY_INDUSTRIAL_IO_ZEPHYR_SIM=y
 EOF
 
-west build -b "${BOARD:-native_sim}" "$APP_DIR" \
+west build -b "${BOARD:-native_sim}" "$APP_DIR" --build-dir "$APP_DIR/build" \
     -- -DZEPHYR_EXTRA_MODULES="$ROOT_DIR"
-
