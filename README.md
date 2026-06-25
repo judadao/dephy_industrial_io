@@ -63,6 +63,21 @@ flowchart TD
 Drivers expose raw signal behavior. The portable core turns raw values into
 stable product-facing IO state.
 
+## Systematic Regression Testing
+
+From the workspace root, run the shared pytest regression module:
+
+```sh
+../dephy_testkit/.venv/bin/python -m pytest ../dephy_testkit/tests/regression --module dephy_industrial_io
+../dephy_testkit/.venv/bin/python -m pytest ../dephy_testkit/tests/regression --module dephy_industrial_io --profile integration
+```
+
+The local repo test remains:
+
+```sh
+make -f Makefile.linux test
+```
+
 ## Docs
 
 - `docs/module_structure.md`: public API, adapter, and test layout.
